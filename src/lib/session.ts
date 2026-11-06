@@ -9,8 +9,6 @@ export type Profile = {
   full_name: string;
   email: string | null;
   role: Role;
-  hourly_rate: number;
-  pay_period: "weekly" | "biweekly" | "monthly";
   consent_at: string | null;
 };
 
@@ -30,7 +28,7 @@ export async function requireProfile() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, company_id, full_name, email, role, hourly_rate, pay_period, consent_at")
+    .select("id, company_id, full_name, email, role, consent_at")
     .eq("id", user.id)
     .single<Profile>();
   if (!profile?.company_id) redirect("/onboarding");
