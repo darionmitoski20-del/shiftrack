@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 export type Role = "owner" | "manager" | "foreman" | "worker";
@@ -20,6 +21,9 @@ export function isManager(role: Role) {
 
 /** Signed-in user's profile and company. Redirects to login or onboarding when missing. */
 export async function requireProfile() {
+  // Signed-in screens always render per request; this also lets the Supabase client
+  // and pages read the clock (Date.now / new Date) without a prerender error.
+  await connection();
   const supabase = await createClient();
   const {
     data: { user },
