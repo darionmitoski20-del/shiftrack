@@ -13,11 +13,11 @@ Next.js (installable PWA) + Supabase. UI is in English.
 | Worker / foreman | Today | Log start, end, break and note for a project; see the week's total |
 | Worker / foreman | My hours | Week by week: status, manager comments, overtime; request a correction on a rejected day |
 | Manager / owner | Approvals | Approve / reject (with comment) each day, accept correction requests, see who hasn't logged today, filter by project |
+| Everyone | Chat | Group chat per project, messages arrive live (text) |
 | Manager / owner | Export | CSV (opens in Excel) of approved hours for the month, with overtime (>40 h/week) and pay = hours × rate |
 
-Not built yet (next steps): project chat screens, push notifications and reminders,
+Not built yet (next steps): photos/documents/voice in chat, direct messages, announcements, push notifications and reminders,
 weekly schedule, day-off requests, incidents, equipment, site diary, documents, PDF export, GPS.
-The chat table (`messages`) and its security rules are already in the database.
 
 ## Setup
 
