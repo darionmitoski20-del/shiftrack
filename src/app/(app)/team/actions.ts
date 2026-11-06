@@ -28,22 +28,32 @@ export async function addPerson(_: AddState, form: FormData): Promise<AddState> 
 
   const { data: updated, error: upErr } = await admin
     .from("profiles")
-    .update({ company_id: profile.company_id, full_name: fullName, role, hourly_rate: rate, pay_period: period })
+    .update({ company_id: profile.company_id, full_name: fullName, role })
     .eq("id", data.user.id)
     .is("company_id", null)
     .select("id");
   if (upErr) return { error: upErr.message };
   if (!updated?.length) return { error: "This email already belongs to another company." };
 
+  const { error: payErr } = await admin
+    .from("pay_settings")
+    .upsert({ user_id: data.user.id, company_id: profile.company_id, hourly_rate: rate, pay_period: period });
+  if (payErr) return { error: payErr.message };
+
   revalidatePath("/team");
   return { ok: `Invite sent to ${email}.` };
 }
 
 export async function updatePerson(form: FormData) {
-  const { supabase } = await requireManager();
+  const { supabase, profile } = await requireManager();
   const rate = Number(form.get("rate"));
   const period = String(form.get("period")) as (typeof PERIODS)[number];
   if (!Number.isFinite(rate) || rate < 0 || !PERIODS.includes(period)) return;
-  await supabase.from("profiles").update({ hourly_rate: rate, pay_period: period }).eq("id", String(form.get("id")));
+  await supabase.from("pay_settings").upsert({
+    user_id: String(form.get("id")),
+    company_id: profile.company_id,
+    hourly_rate: rate,
+    pay_period: period,
+  });
   revalidatePath("/team");
 }

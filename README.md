@@ -22,7 +22,7 @@ weekly schedule, day-off requests, incidents, equipment, site diary, documents, 
 ## Setup
 
 1. Create a free project at [supabase.com](https://supabase.com).
-2. In the Supabase SQL editor, run `supabase/migrations/20261106000000_init.sql`.
+2. In the Supabase SQL editor, run the files in `supabase/migrations/` in order (oldest first).
 3. In **Authentication → URL configuration**, set the Site URL to where the app runs (e.g. `http://localhost:3000`).
 4. In **Authentication → Email templates**, change the links so they come back to the app:
    - Invite user: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite`
@@ -34,5 +34,5 @@ weekly schedule, day-off requests, incidents, equipment, site diary, documents, 
 ## Security
 
 Every table has row level security: people only see their own company, workers only see
-their own hours, only managers approve, and only the owner changes roles. The service role key
+their own hours and pay rate, only managers approve, and only the owner changes roles. The service role key
 is used only on the server, for inviting people from the Team page.

@@ -10,7 +10,7 @@ type Row = {
   break_minutes: number;
   minutes: number;
   status: string;
-  profiles: { full_name: string; hourly_rate: number; pay_period: string } | null;
+  profiles: { full_name: string; pay_settings: { hourly_rate: number; pay_period: string } | null } | null;
   projects: { name: string } | null;
 };
 
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await supabase
     .from("time_entries")
-    .select("user_id, work_date, start_time, end_time, break_minutes, minutes, status, profiles!time_entries_user_id_fkey(full_name, hourly_rate, pay_period), projects(name)")
+    .select("user_id, work_date, start_time, end_time, break_minutes, minutes, status, profiles!time_entries_user_id_fkey(full_name, pay_settings(hourly_rate, pay_period)), projects(name)")
     .eq("status", "approved")
     .gte("work_date", isoDate(from))
     .lte("work_date", isoDate(to))
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
   for (const r of data ?? []) {
     const name = r.profiles?.full_name ?? "";
     lines.push([name, r.work_date, r.projects?.name ?? "", r.start_time.slice(0, 5), r.end_time.slice(0, 5), r.break_minutes, (r.minutes / 60).toFixed(2)]);
-    const w = perWorker.get(r.user_id) ?? { name, rate: Number(r.profiles?.hourly_rate ?? 0), period: r.profiles?.pay_period ?? "", minutes: 0, weeks: new Map() };
+    const w = perWorker.get(r.user_id) ?? { name, rate: Number(r.profiles?.pay_settings?.hourly_rate ?? 0), period: r.profiles?.pay_settings?.pay_period ?? "", minutes: 0, weeks: new Map() };
     w.minutes += r.minutes;
     const wk = isoDate(weekStart(parseIsoDate(r.work_date)!));
     w.weeks.set(wk, (w.weeks.get(wk) ?? 0) + r.minutes);
