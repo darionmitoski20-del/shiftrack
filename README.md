@@ -8,7 +8,7 @@ Next.js (installable PWA) + Supabase. UI is in English.
 | Who | Screen | What it does |
 | --- | --- | --- |
 | Owner | Sign up → Set up company | Creates the company; the owner becomes its admin |
-| Manager / owner | Team | Invite workers, foremen (owner also managers) by email; set hourly rate and pay period per person |
+| Manager / owner | Team | Create accounts for workers, foremen (owner also managers) with an email and a starting password; set hourly rate and pay period per person |
 | Manager / owner | Projects | Create projects (name, address, client, work days) and assign people |
 | Worker / foreman | Today | Log start, end, break and note for a project; see the week's total |
 | Worker / foreman | My hours | Week by week: status, manager comments, overtime; request a correction on a rejected day |
@@ -35,4 +35,4 @@ weekly schedule, day-off requests, incidents, equipment, site diary, documents, 
 
 Every table has row level security: people only see their own company, workers only see
 their own hours and pay rate, only managers approve, and only the owner changes roles. The service role key
-is used only on the server, for inviting people from the Team page.
+is used only on the server, for creating accounts from the Team page.

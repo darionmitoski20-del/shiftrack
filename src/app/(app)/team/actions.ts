@@ -9,7 +9,7 @@ const PERIODS = ["weekly", "biweekly", "monthly"] as const;
 
 export type AddState = { ok?: string; error?: string };
 
-/** Invites a new person by email and attaches them to the manager's company. */
+/** Creates an account with a password the manager hands to the person, and attaches it to the company. */
 export async function addPerson(_: AddState, form: FormData): Promise<AddState> {
   const { profile } = await requireManager();
   const email = String(form.get("email") ?? "").trim().toLowerCase();
@@ -17,14 +17,21 @@ export async function addPerson(_: AddState, form: FormData): Promise<AddState> 
   const role = String(form.get("role")) as (typeof ROLES)[number];
   const period = String(form.get("period")) as (typeof PERIODS)[number];
   const rate = Number(form.get("rate") ?? 0);
+  const password = String(form.get("password") ?? "");
   if (!email || !fullName) return { error: "Name and email are required." };
+  if (password.length < 8) return { error: "Password must be at least 8 characters." };
   if (!ROLES.includes(role) || !PERIODS.includes(period)) return { error: "Invalid role or pay period." };
   if (role === "manager" && profile.role !== "owner") return { error: "Only the owner can add managers." };
   if (!Number.isFinite(rate) || rate < 0) return { error: "Hourly rate is not valid." };
 
   const admin = createAdminClient();
-  const { data, error } = await admin.auth.admin.inviteUserByEmail(email, { data: { full_name: fullName } });
-  if (error || !data.user) return { error: error?.message ?? "Could not invite this email." };
+  const { data, error } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { full_name: fullName },
+  });
+  if (error || !data.user) return { error: error?.message ?? "Could not create this account." };
 
   const { data: updated, error: upErr } = await admin
     .from("profiles")
@@ -41,7 +48,7 @@ export async function addPerson(_: AddState, form: FormData): Promise<AddState> 
   if (payErr) return { error: payErr.message };
 
   revalidatePath("/team");
-  return { ok: `Invite sent to ${email}.` };
+  return { ok: `Account created. Give ${fullName} the email ${email} and the password to sign in.` };
 }
 
 export async function updatePerson(form: FormData) {
